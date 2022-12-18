@@ -17,7 +17,7 @@ $_SESSION["cday"] = flush_database($conn,$_SESSION["cday"]);
 $booking=$_SESSION["booking"];
 $booked = 0;
 $avail=$_SESSION["avail"];
-
+$minus=-1;
 $day=$_SESSION["day"];
 $slotid1=$_SESSION["slotid1"];
 $slotid2=$_SESSION["slotid2"];
@@ -30,120 +30,45 @@ $rollno="";
 $fname="";
 $sname="";
 $ba="";
-
+$students="";
 if(isset($_POST['MainMenu']))
 {
     header('Location: ' . "functions.php");
     die();
+    // but i wanted to live :c
 }
-if($avail==1){
-    if($slotid1==$slotid2){
-            $sql="select * from student where batch_id =? and roll_no 
-            in (select roll_no from enrolments where course_id = ?) and roll_no 
-            in (select roll_no from enrolments where course_id 
-            in (select course_id from weeklytable where day = ? and slot_id = ?) );";
-            $q1=$conn->prepare($sql);
-            $q1->bind_param("dssd",$batchid,$courseid,$day,$slotid1);
-            $q1->execute();
-            $q1->bind_result($rollno,$ba,$fname,$sname);
-            $q1->store_result();
-            $row=0;
-            while($q1->fetch()){
-                 $row++;
-            }
-        if($row>0){
-            echo "<p>".$row.' students have clashes.'."</p>";
-            $q1=$conn->prepare($sql);
-            $q1->bind_param("dssd",$batchid,$courseid,$day,$slotid1);
-            $q1->execute();
-            $q1->bind_result($rollno,$ba,$fname,$sname);
-            $q1->store_result();
-            while($q1->fetch()){
-                echo "<p>".$rollno.' '.$fname.' '.$sname."</p>";
-           }
-        }else{
-            echo "<p> 0 students have clashes</p>";
-        }   
-    }
-    if($slotid2>$slotid1){
-        $sql="select * from student where batch_id =? and roll_no 
-            in (select roll_no from enrolments where course_id = ?) and roll_no 
-            in (select roll_no from enrolments where course_id 
-            in (select course_id from weeklytable where day = ? and slot_id >=? and slot_id<=?) );";
-            $q1=$conn->prepare($sql);
-            $q1->bind_param("dssdd",$batchid,$courseid,$day,$slotid1,$slotid2);
-            $q1->execute();
-            $q1->bind_result($rollno,$ba,$fname,$sname);
-            $q1->store_result();
-            $row=0;
-            while($q1->fetch()){
-                $row++;
-            }
-           if($row>0){
-                echo "<p>".$row.' students have clashes.'."</p>";
-                $q1=$conn->prepare($sql);
-                $q1->bind_param("dssdd",$batchid,$courseid,$day,$slotid1,$slotid2);
-                $q1->execute();
-                $q1->bind_result($rollno,$ba,$fname,$sname);
-                $q1->store_result();
-                while($q1->fetch()){
-                    echo "<p>".$rollno.' '.$fname.' '.$sname."</p>";
-               }
-           }else{
-            echo "<p> 0 students have clashes</p>";
-        }  
-    }
-}else{
-    if($slotid1==$slotid2){
-        $sql="select * from student where roll_no in (select roll_no from enrolments where course_id = ?) and roll_no in 
-        (select roll_no from enrolments where course_id in (select course_id from weeklytable where day =? and slot_id = ?) );";
+
+        $sql="select s.roll_no , s.first_name , s.second_name from student as s, enrolments as e where e.roll_no = s.roll_no and e.course_id = ? and (s.batch_id = ? or ? = -1);";
         $q1=$conn->prepare($sql);
-        $q1->bind_param("ssd",$courseid,$day,$slotid1);
+        $q1->bind_param("sdd",$courseid,$batchid,$batchid);
         $q1->execute();
-        $q1->bind_result($rollno,$ba,$fname,$sname);
-        $q1->store_result();
+        $q1->bind_result($rollno,$fname,$sname);
+        $total=0;
+        while($q1->fetch()){
+           $total++;
+        }
+        // echo "<p>".$total." student/s have clashes.";
+        $q1->close();
+
+        $sql="select s.roll_no , s.first_name , s.second_name from student as s , weeklytable as w , enrolments as e where e.course_id = w.course_id and e.roll_no = s.roll_no and w.day = ? and w.slot_id >= ? and w.slot_id <= ? and (s.batch_id = w.batch_id or w.batch_id is null) intersect select s.roll_no , s.first_name , s.second_name from student as s, enrolments as e where e.roll_no = s.roll_no and e.course_id = ? and (s.batch_id = ? or ? = -1);";
+        $q1=$conn->prepare($sql);
+        $q1->bind_param("sddsdd",$day,$slotid1,$slotid2,$courseid,$batchid,$batchid);
+        $q1->execute();
+        $q1->bind_result($rollno,$fname,$sname);
         $row=0;
         while($q1->fetch()){
-            $row++;
+           $row++;
         }
-        if($row>0){
-            $q1=$conn->prepare($sql);
-            $q1->bind_param("ssd",$courseid,$day,$slotid1);
-            $q1->execute();
-            $q1->bind_result($rollno,$ba,$fname,$sname);
-            $q1->store_result();
-            while($q1->fetch()){
-                echo "<p>".$rollno.' '.$fname.' '.$sname."</p>";
-           }
-        }else{
-            echo "<p> 0 students have clashes</p>";
-        }  
-    }else{
-        $sql="select * from student where roll_no in (select roll_no from enrolments where course_id = ?) and roll_no in 
-        (select roll_no from enrolments where course_id in (select course_id from weeklytable where day =? and slot_id >=?  and slot_id<=?) );";
+        echo "<p>".$row." out of ".$total." student(s) have clashes.</p>";
+        $q1->close();
         $q1=$conn->prepare($sql);
-        $q1->bind_param("ssdd",$courseid,$day,$slotid1,$slotid2);
+        $q1->bind_param("sddsdd",$day,$slotid1,$slotid2,$courseid,$batchid,$batchid);
         $q1->execute();
-        $q1->bind_result($rollno,$ba,$fname,$sname);
-        $q1->store_result();
-        $row=0;
+        $q1->bind_result($rollno,$fname,$sname);
         while($q1->fetch()){
-            $row++;
+           echo "<p>".$rollno.' '.$fname.' '.$sname."</p>";
         }
-        if($row>0){
-            $q1=$conn->prepare($sql);
-            $q1->bind_param("ssdd",$courseid,$day,$slotid1,$slotid2);
-            $q1->execute();
-            $q1->bind_result($rollno,$ba,$fname,$sname);
-            $q1->store_result();
-            while($q1->fetch()){
-                echo "<p>".$rollno.' '.$fname.' '.$sname."</p>";
-           }
-        }else{
-            echo "<p> 0 students have clashes</p>";
-        }  
-    }   
-}
+
 if(isset($_POST['Cancel']))
 {
     header('Location: ' . "schedule.php");

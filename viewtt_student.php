@@ -11,7 +11,7 @@
     <script src="https://kit.fontawesome.com/faeaa9a8c9.js" crossorigin="anonymous"></script>
 </head>
     <nav>
-            <div class="logout" name="View" onclick="window.location.href='student.php';" formaction=# value="View" ><i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+            <div class="logout" name="View" onclick="window.location.href='student.php';" formaction=# value="View" ><img src="logout.png" class="log"></i>
             </div> 
     </nav>
         <!-- logo -->
@@ -37,6 +37,17 @@
     $roll=$_SESSION["rollnum"];
     $days = array("Monday","Tuesday","Wednesday","Thursday","Friday");
     $all_slots = array("8-9 AM","9-10 AM","10:15-11:15 AM","11:15-12:15 PM","1-2 PM","2-3 PM","3-4 PM","4-5 PM");
+
+    $q="SELECT first_name,second_name from student where roll_no=?";
+    $q1=$conn->prepare($q);
+    $q1->bind_param("s",$roll);
+    $q1->execute();
+    $q1->bind_result($studfname,$studsname);
+    $q1->store_result();
+    while($q1->fetch())
+    {
+        echo '<h1>'.$studfname.' '.$studsname.'</h1>';
+    }
 
     echo "<html><body><center><justify><table class='table1'cellspacing=0 cellpadding=0>";
     echo '<tr><center>';

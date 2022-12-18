@@ -1,6 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 *{
-    margin: 0;
     padding: 0;
     box-sizing: border-box;
     font-family: 'Poppins', sans-serif;
@@ -25,38 +24,22 @@ body{
     }
 }
 form {
-    width: 100%;
-    height: 100vh;
+    border-radius: 15px;
     display: grid;
-   justify-content: center;
-    align-items: center;
-   
-    
+    justify-content: center;
+    align-content: center;
+    width:100%;
   }
 
-  .table1{
-      table-layout: fixed;
-     
-    }
-
-    tr:nth-child(2n){
-         background: #f0f095; 
-         color:#08090a;
-         width: 10%;
-         
-      }
-    
-      
-      tr:nth-child(2n+1){
-        background: #ffffff; 
-        color:#17191e;
-        width: 10%;
-        
-     }
-      
-     
-     
-
+.neww{
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  grid-template-rows: repeat(3,1fr);
+  width:100%;
+  padding-left: 210px;
+  gap:15px;
+  padding-bottom: 10px;
+}
       .header {
         display: flex;
         justify-content: center;
@@ -71,6 +54,7 @@ form {
       .custom-select {
         position: relative;
         text-align: center;
+        display: grid;
         }
       
       .custom-select select {
@@ -78,7 +62,7 @@ form {
       }
       
       .select-selected {
-        background-color: rgb(255, 255, 255);
+        background-color: rgba(255, 255, 255,0.4);
       }
       
       /* Style the arrow inside the select element: */
@@ -104,7 +88,7 @@ form {
       
       /* style the items (options), including the selected item: */
       .select-items div,.select-selected {
-        color: #000000;
+        color: rgb(0,0,0);
         padding: 8px 16px;
         border: 1px solid transparent;
         border-color: transparent transparent rgba(0, 0, 0, 0.1) transparent;
@@ -131,7 +115,6 @@ form {
       }
       .input__box {
         width: 100%;
-        margin-top: 20px;
         flex:content;
         justify-content: center;
     }
@@ -150,6 +133,7 @@ form {
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
         border-right: 1px solid rgba(255, 255, 255, 0.2);
         border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        margin-bottom: 10px;
     }
     
     input::placeholder {
@@ -162,10 +146,6 @@ form {
         background: #fff;
         max-width: fit-content;
         font-weight: 600;
-        margin-bottom: 20px;
         justify-content: center;
         margin-left: 45px;
     }
-
-      
-     

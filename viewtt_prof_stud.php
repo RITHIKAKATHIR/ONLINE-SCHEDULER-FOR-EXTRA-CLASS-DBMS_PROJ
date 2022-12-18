@@ -55,19 +55,12 @@
        </nav>
     <!-- logo -->
           <div class="logo"><span><img src="Nitc_logo.png"> </span></div>
-    <!-- title & content -->
-          <!-- <section class="header-content">
-          <h3>Choose the details to continue</h3>
-          </section> -->
+
             <div class="glass-panel" >
                 <div class="form">
                 <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
     <label for="">
-        <!-- <p>
-            <font size="+2">
-            Enter Branch and batch:
-</font>
-</p> -->
+
 <div class="select">
             <select name="batch" id="">
             <option value="" disbaled selected hidden>Select Branch and Batch&nbsp&#x25BC</option>
@@ -82,7 +75,7 @@
                     $q1->store_result();
                     while($q1->fetch())
                     {
-                        echo '<option value="'.$batchid.'">'.$dept.' '.$batch.' '.$s.$semester.'</option>';
+                        echo '<option value="'.$batchid.'">'.$dept.' '.$batch.' S'.$semester.'</option>';
                     }
                 ?>
             </select>
@@ -100,6 +93,4 @@
     </div>
 </body>
 </html>
-
-
 

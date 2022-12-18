@@ -2,6 +2,7 @@
     include 'dbconnection.php';
     $conn = OpenCon();
     $_SESSION["cday"] = flush_database($conn,$_SESSION["cday"]);
+    $prof = $_SESSION["pid"];
 ?>
 
 <!DOCTYPE html>
@@ -31,14 +32,25 @@
        <header>
         <!-- navbar -->
      <nav>
-        <div class="logout" name="View" onclick="window.location.href='home.php';" formaction=# value="View" ><i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+        <div class="logout" name="View" onclick="window.location.href='home.php';" formaction=# value="View" ><img src="logout.png" class="log" aria-hidden="true"></i>
         </div> 
        </nav>
     <!-- logo -->
           <div class="logo"><span><img src="Nitc_logo.png"> </span></div>
     <!-- title & content -->
           <section class="header-content">
-          <h1>Welcome Professor!</h1>
+            <?php 
+                $q="SELECT first_name,second_name from professor where prof_id=?";
+                $q1=$conn->prepare($q);
+                $q1->bind_param("d",$prof);
+                $q1->execute();
+                $q1->bind_result($proffname,$profsname);
+                $q1->store_result();
+                while($q1->fetch())
+                {
+                    echo '<h1>Welcome '.$proffname.' '.$profsname.'!</h1>';
+                }
+            ?>
           </section>
             <div class="glass-panel" >
                 <div class="form">

@@ -36,7 +36,7 @@
         <div class="flex-container">
         
           <div onclick="window.location.href='student.php';" class="flex-child magenta">
-          <i class="fa-solid fa-user"></i>
+          <img src="stud.png" class="stud">
           <center>
             <section class="header-content">
                 <a href="student.php">
@@ -48,7 +48,7 @@
           </div>
           
           <div onclick="window.location.href='professor.php';" class="flex-child green">
-          <i class="fa-solid fa-user-tie"></i>
+          <img src="prof.png" class="stud">
             <center>
                 <section class="header-content">
             <button onclick="window.location.href='professor.php';">Professor</button>

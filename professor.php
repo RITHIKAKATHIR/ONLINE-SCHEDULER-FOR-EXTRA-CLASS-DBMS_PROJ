@@ -26,39 +26,44 @@ if(isset($_POST['login']))
 {
     if(empty($_POST['username']))
     {
-        $error1= "<p>Please enter username.</p>";
+        $err1= "<p>Please enter username.</p>";
     }
-    if(!empty($_POST['username']))
+    else
     {
-        $username= clean_kuttapi($_POST['username']);
+        $username = explode(" ",clean_kuttapi($_POST['username']));
+        $username[1] = implode(" ",array_slice($username,1));
+        $username = array_slice($username,0,2);
     }
 
     if(empty($_POST['password']))
     {
-        $error2= "<p>Please enter password</p>";
+        $err2= "<p>Please enter password</p>";
     }
-    if(!empty($_POST['password']))
+    else
     {
         $password= clean_kuttapi($_POST['password']);
     }
     if(strlen($err1) == 0 && strlen($err2) == 0){
-        $q = "select prof_id, first_name, password from professor where first_name = ? and password = ? limit 1";
+        $q = "select prof_id, password from professor where first_name = ? and second_name = ? and password = ? limit 1";
         $q1 = $conn->prepare($q);
-        $q1->bind_param("ss", $username, $password);
+        $q1->bind_param("sss", $username[0],$username[1],$password);
         $q1->execute();
-        $q1->bind_result($id,$u,$p);
+        $q1->bind_result($id,$p);
         $flag=0;
         $q1->store_result();
         while($q1->fetch()){
-            $_SESSION["pid"]=$id;
-            echo $_SESSION["pid"];
-            $flag=1;
+            if(strcmp($password,$p)==0)
+            {
+                $_SESSION["pid"]=$id;
+                echo $_SESSION["pid"];
+                $flag=1;
+            }
         }
         if($flag==0){
             $err= "invalid credentials";
         }
     }
-    if(strlen($err) == 0){
+    if(strlen($err) == 0 && strlen($err1) == 0 && strlen($err2) == 0){
         echo "hi";
         header('Location: ' . "functions.php");
         die();
@@ -111,7 +116,7 @@ if(isset($_POST['login']))
                         </div>
                         <div class="input__box">
                             <input type="password" name="password" placeholder="Password"  />
-                            <?php echo $err1; ?>
+                            <?php echo $err2; ?>
                         </div>
                         <div>                                
                             <?php

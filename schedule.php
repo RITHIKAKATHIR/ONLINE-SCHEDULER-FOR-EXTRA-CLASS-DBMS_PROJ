@@ -1,5 +1,3 @@
-
-
 <?php 
 session_start();
 include 'dbconnection.php';
@@ -187,7 +185,7 @@ if(isset($_POST['checktt'])){
                         }
                         if($flag2==0){
                             $q1->close();
-                            $_SESSION["batchid"]=$batchid;
+                            $_SESSION["batchid"]=-1;
                             $_SESSION["booking"]=2;
                             header('Location: ' . "confirmation.php");
                             die();
@@ -205,7 +203,7 @@ if(isset($_POST['checktt'])){
             
             $i=$slotid1;
             $flag0=0;
-            while($i<$slotid2){
+            while($i<=$slotid2){
                 $profCheck="SELECT * FROM weeklytable WHERE day=? and slot_id=? and prof_id=?";
                 $q1=$conn->prepare($profCheck);
                 $q1->bind_param("sdd",$day,$i,$prof);
@@ -218,9 +216,9 @@ if(isset($_POST['checktt'])){
             }
             
             if($flag0==0){
-                    $roomCheck="SELECT * FROM weeklytable WHERE day=? and slot_id=? and room_id=?";
+                    $roomCheck="SELECT * FROM weeklytable WHERE day=? and slot_id>=? and slot_id<=? and room_id=?";
                     $q1=$conn->prepare($roomCheck);
-                    $q1->bind_param("sdd",$day,$slotid1,$roomid);
+                    $q1->bind_param("sddd",$day,$slotid1,$slotid2,$roomid);
                     $q1->execute();
 
                     $flag1=0;
@@ -274,11 +272,12 @@ if(isset($_POST['checktt'])){
                                 }
                                 $i=$i+1;
                                 $q1->close();
-                                if($flag2==1){
+                                // if($flag2==1){
                                    
-                                }
+                                // }
                             if($flag2==0){
-                                $q1->close();
+                                // $q1->close();
+                                $_SESSION["batchid"] = -1;
                                 $_SESSION["booking"]=4;
                                 header('Location: ' . "confirmation.php");
                                 die();
@@ -316,9 +315,10 @@ if(isset($_POST['checktt'])){
        <div class="logo"><span><img src="Nitc_logo.png"> </span></div>
 
     <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method = "post">
+    <div class="neww">
         <label for="" name="day">
             <!--Day:-->
-            <div class="custom-select">
+            <div class="custom-select box1">
             <select name="day" id="">
                 <option value="" disbaled selected hidden> -Select Day- </option>
                 <option value="Monday">Monday</option>
@@ -331,6 +331,7 @@ if(isset($_POST['checktt'])){
            
         </label>
         <br>
+        
         <?php 
             echo $error1;
             
@@ -338,7 +339,7 @@ if(isset($_POST['checktt'])){
         <br>
         <label for="">
          <!--Classroom:-->
-            <div class="custom-select">
+            <div class="custom-select box2">
             <select name="room" id="">
             <option value="" disbaled selected hidden> -Select Classroom- </option>
                 <?php
@@ -363,7 +364,7 @@ if(isset($_POST['checktt'])){
         <br>
         <label for="">
             <!--Branch and batch:-->
-            <div class="custom-select">
+            <div class="custom-select box3">
             <select name="batch" id="">
             <option value="" disbaled selected hidden> -Select Branch and Batch- </option>
                 <?php
@@ -385,13 +386,16 @@ if(isset($_POST['checktt'])){
             </div>
         </label>
         <br>
+        <?php echo $error5;?>
+        <br>
+        <br>
         
         <br>
         <label for="">
            <!--Class Start Time:-->
-            <div class="custom-select">
+            <div class="custom-select box4">
             <select name="start" id="">
-            <option value="" disbaled selected hidden> -Select Start Time- </option>
+            <option value="" disbaled selected hidden>   -Select Start Time-   </option>
                 <option value="1">8:00</option>
                 <option value="2">9:00</option>
                 <option value="3">10:15</option>
@@ -408,7 +412,7 @@ if(isset($_POST['checktt'])){
         <br>
         <label for="">
             <!--Class End Time:-->
-            <div class="custom-select">
+            <div class="custom-select box5">
             <select name="end" id="">
             <option value="" disbaled selected hidden> -Select End Time- </option>
                 <option value="1">9:00</option>
@@ -427,7 +431,7 @@ if(isset($_POST['checktt'])){
         <br>
         <label for="">
             <!--Course:-->
-            <div class="custom-select">
+            <div class="custom-select box6">
             <select name="course" id="">
             <option value="" disbaled selected hidden> -Select Course- </option>
             <?php
@@ -446,6 +450,7 @@ if(isset($_POST['checktt'])){
                 ?>
             </select>
             </div>
+            
             <script>
 var x, i, j, l, ll, selElmnt, a, b, c;
 /*look for any elements with the class "custom-select":*/
@@ -525,11 +530,15 @@ function closeAllSelect(elmnt) {
 /*if the user clicks anywhere outside the select box,
 then close all select boxes:*/
 document.addEventListener("click", closeAllSelect);
-</script>
+
+    </script>
+    
         </label>
         <br>
-        <?php echo $error5; ?>
-        <br>
+    <?php echo $error5; ?>
+    <br>
+</div>
+                
         <style>
     <?php include 'ttinschedule.css';?>
     </style>
@@ -542,7 +551,7 @@ document.addEventListener("click", closeAllSelect);
             echo '<tr><center>';
             echo '<th class="days"><center>' . "DAY/SLOT" . '</center></th>';
             foreach($all_slots as $s){
-                echo '<th class="days"><center>' . $s . '</center></th>';
+                echo '<th class="time"><center>' . $s . '</center></th>';
             }
             echo '</center></tr>';
         
@@ -556,10 +565,9 @@ document.addEventListener("click", closeAllSelect);
             <div class="input__box">
         <input type="submit" name="checktt" value="Check">
         </center>
-    </form>
-
-                </form>
-    </form>
+        </form>
+</form>
+</form> 
 </body>
 
 </html>

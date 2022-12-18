@@ -4,7 +4,7 @@ function OpenCon()
 {
     $dbhost = "localhost";
     $dbuser = "root";
-    $dbpass = "DBMS_project9";
+    $dbpass = "";
     $db = "extra_class";
 
     $conn = new mysqli($dbhost, $dbuser, $dbpass,$db) or die("Connect failed: %s\n". $conn -> error);
@@ -15,7 +15,7 @@ function OpenCon()
 function flush_database($conn,$current_day){
     $days = array("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday");
     $today = date("l");
-    if(array_search($today,$days)>array_search($current_day,$days)){
+    if( array_search($today,$days)+1 > (array_search($current_day,$days)+1)%7 ){
       $sql = "DELETE FROM weeklytable where day = '".$current_day."'";
       $q1 = $conn -> prepare($sql);
       $q1 -> execute();
@@ -24,8 +24,9 @@ function flush_database($conn,$current_day){
       $q1 = $conn -> prepare($sql);
       $q1 -> execute();
       $current_day = $today;
-      return $current_day;
     }
+    return date("l");
+
 }
 
 function CloseCon($conn)

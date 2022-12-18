@@ -2,6 +2,7 @@
     session_start();
     include 'dbconnection.php';
     $conn = OpenCon();
+    $_SESSION["cday"] = flush_database($conn,$_SESSION["cday"]);
 
     $prof = $_SESSION["pid"];
     $proffname = "";
@@ -101,8 +102,49 @@ if(isset($_POST['logout']))
     <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="bg2.css">
     <link rel="stylesheet" href="tt.css">
+    <script type="text/javascript">
+        function onload() {
+            var tds = document.getElementsByTagName("td");
+            for(var i = 0; i < tds.length; i++) {
+                tds[i].onclick = 
+                                function(td) { 
+                                    return function() { 
+                                        tdOnclick(td); 
+                                    }; 
+                                }(tds[i]); 
+            }
+            var inputs = document.getElementsByTagName("input");
+            for(var i = 0; i < inputs.length; i++) {
+                inputs[i].onclick = 
+                                function(input){ 
+                                    return function() { 
+                                        inputOnclick(input); 
+                                    };
+                                }(inputs[i]); 
+            }
+        }
+        function tdOnclick(td) {
+            for(var i = 0; i < td.childNodes.length; i++) {
+                if(td.childNodes[i].nodeType == 1) {
+                    if(td.childNodes[i].nodeName == "INPUT") {
+                        if(td.childNodes[i].checked) {
+                            td.childNodes[i].checked = false;
+                        } else {
+                            td.childNodes[i].checked = true;
+                        }
+                    } else {
+                        tdOnclick(td.childNodes[i]);
+                    }
+                }
+            }
+        }
+        function inputOnclick(input) {
+            input.checked = !input.checked;
+            return false;
+        }
+    </script>
 </head>
-<body>
+<body onload = "onload()">
 <nav>
         <ul>
           <li style="font-family: 'Poppins', sans-serif" ><a href='functions.php'> &laquo Back</a></li>
@@ -141,7 +183,7 @@ if(isset($_POST['logout']))
                 ?>
             </tr>
             <?php
-                $q="SELECT course.course_id,classroom.building,classroom.room FROM weeklytable INNER JOIN course ON course.course_id=weeklytable.course_id INNER JOIN classroom ON weeklytable.room_id = classroom.room_id WHERE day = ? AND slot_id = ? AND prof_id = ?";
+                $q="SELECT distinct course.course_id FROM weeklytable INNER JOIN course ON course.course_id=weeklytable.course_id  WHERE day = ? AND slot_id = ? AND prof_id = ?";
                 $q1=$conn->prepare($q);
                 $q1->bind_param("sdd",$day,$slotid,$prof);
                 $days = array("Monday","Tuesday","Wednesday","Thursday","Friday");
@@ -154,11 +196,22 @@ if(isset($_POST['logout']))
                         //echo '<td class="t2"><center>';
                         $flag = 0;
                         $q1->execute();
-                        $q1->bind_result($course,$building,$room);
+                        $q1->bind_result($course);
                         $q1->store_result();
-                        while($q1->fetch())
+                        if($q1->fetch())
                         {   $flag= 1;
-                            echo '<td class="t2"><center><input type="checkbox" name="'.$day.'slots[]" value="'.$slotid.'">'.$course.'<br>'.$building.' '.$room.'<br></center></td>';
+                            echo '<td class="t2"><center><input type="checkbox" name="'.$day.'slots[]" value="'.$slotid.'">'.$course.'<br>';
+                            $q2="SELECT classroom.building,classroom.room from weeklytable inner join classroom on weeklytable.room_id = classroom.room_id where day = ? and slot_id = ? and prof_id = ?";
+                            $q3=$conn->prepare($q2);
+                            $q3->bind_param("sdd",$day,$slotid,$prof);
+                            $q3->execute();
+                            $q3->bind_result($builing,$room);
+                            $q3->store_result();
+                            while($q3->fetch())
+                            {
+                                echo $builing.' '.$room.'<br>';
+                            }
+                            echo '</center></td>';
                         }
                         if(!$flag){
                             echo '<td class="t2"><center><br>-<br></center></td>';
